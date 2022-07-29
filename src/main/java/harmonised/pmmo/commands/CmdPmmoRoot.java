@@ -4,6 +4,8 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
+import harmonised.pmmo.network.Networking;
+import harmonised.pmmo.network.clientpackets.CP_OpenConfigGUI;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
@@ -14,7 +16,12 @@ public class CmdPmmoRoot {
 		dispatcher.register(Commands.literal("pmmo")
 				.then(CmdNodeAdmin.register(dispatcher))
 				.then(CmdNodeParty.register(dispatcher))
-				.then(Commands.literal("resync"))
+				.then(Commands.literal("configure")
+						.requires(ctx -> ctx.hasPermission(2))
+						.executes(ctx -> {
+							Networking.sendToClient(new CP_OpenConfigGUI(), ctx.getSource().getPlayerOrException());
+							return 0;
+						}))						
 				.then(Commands.literal("tools"))
 				.then(Commands.literal("checkbiome"))
 				.then(Commands.literal("debug"))

@@ -3,6 +3,7 @@ package harmonised.pmmo.network;
 import harmonised.pmmo.api.enums.ObjectType;
 import harmonised.pmmo.config.readers.CoreParser;
 import harmonised.pmmo.network.clientpackets.CP_ClearData;
+import harmonised.pmmo.network.clientpackets.CP_OpenConfigGUI;
 import harmonised.pmmo.network.clientpackets.CP_ResetXP;
 import harmonised.pmmo.network.clientpackets.CP_SetOtherExperience;
 import harmonised.pmmo.network.clientpackets.CP_SyncData_ClearXp;
@@ -14,6 +15,7 @@ import harmonised.pmmo.network.clientpackets.CP_SyncVein;
 import harmonised.pmmo.network.clientpackets.CP_UpdateExperience;
 import harmonised.pmmo.network.clientpackets.CP_UpdateLevelCache;
 import harmonised.pmmo.network.serverpackets.SP_OtherExpRequest;
+import harmonised.pmmo.network.serverpackets.SP_PostConfiguration;
 import harmonised.pmmo.network.serverpackets.SP_SetVeinLimit;
 import harmonised.pmmo.network.serverpackets.SP_UpdateVeinTarget;
 import harmonised.pmmo.util.MsLoggy;
@@ -76,6 +78,11 @@ public class Networking {
 			.decoder(buf -> new CP_ClearData())
 			.consumerNetworkThread(CP_ClearData::handle)
 			.add();
+		INSTANCE.messageBuilder(CP_OpenConfigGUI.class, ID++)
+			.encoder((packet, buf) -> {})
+			.decoder(buf -> new CP_OpenConfigGUI())
+			.consumerNetworkThread(CP_OpenConfigGUI::handle)
+			.add();
 		INSTANCE.messageBuilder(CP_SetOtherExperience.class, ID++)
 			.encoder(CP_SetOtherExperience::toBytes)
 			.decoder(CP_SetOtherExperience::new)
@@ -106,6 +113,11 @@ public class Networking {
 			.encoder(SP_SetVeinLimit::encode)
 			.decoder(SP_SetVeinLimit::new)
 			.consumerNetworkThread(SP_SetVeinLimit::handle)
+			.add();
+		INSTANCE.messageBuilder(SP_PostConfiguration.class, ID++)
+			.encoder(SP_PostConfiguration::encode)
+			.decoder(SP_PostConfiguration::new)
+			.consumerNetworkThread(SP_PostConfiguration::handle)
 			.add();
 		MsLoggy.INFO.log(LOG_CODE.NETWORK, "Messages Registered");
 	}

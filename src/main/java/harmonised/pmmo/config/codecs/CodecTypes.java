@@ -17,6 +17,7 @@ import harmonised.pmmo.api.enums.EventType;
 import harmonised.pmmo.api.enums.ModifierDataType;
 import harmonised.pmmo.api.enums.ReqType;
 import harmonised.pmmo.core.nbt.LogicEntry;
+import harmonised.pmmo.util.CodecSpec.*;
 import harmonised.pmmo.util.Functions;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.StringRepresentable;
@@ -110,6 +111,14 @@ public class CodecTypes {
 			
 			return new SalvageData(chancePerLevel, levelReq, xpAward, salvageMax.get(), baseChance.get(), maxChance.get());
 		}
+		
+		public static final GroupSpec GROUP_SPEC = new GroupSpec("salvage", List.of(
+				new MapSpec("chancePerLevel", String.class, Double.class),
+				new MapSpec("levelReq", String.class, Integer.class),
+				new MapSpec("xpPerItem", String.class, Long.class),
+				new PrimativeSpec("salvageMax", Integer.class),
+				new PrimativeSpec("baseChanc", Double.class),
+				new PrimativeSpec("maxChance", Double.class)));
 	}
 	public static final Codec<SalvageData> SALVAGE_CODEC = RecordCodecBuilder.create(instance -> instance.group(
 			Codec.unboundedMap(Codec.STRING, Codec.DOUBLE).fieldOf("chancePerLevel").forGetter(SalvageData::chancePerLevel),

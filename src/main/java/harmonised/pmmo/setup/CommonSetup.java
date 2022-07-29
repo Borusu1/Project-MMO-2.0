@@ -111,7 +111,7 @@ public class CommonSetup {
 	public static void gatherData(GatherDataEvent event) {
 		DataGenerator generator = event.getGenerator();
 		if (event.includeClient()) {
-			generator.addProvider(true, new LangProvider(generator, "en_us"));
+			generator.addProvider(true, new LangProvider(generator, LangProvider.Locale.EN_US.str));
 		}
 	}
 }

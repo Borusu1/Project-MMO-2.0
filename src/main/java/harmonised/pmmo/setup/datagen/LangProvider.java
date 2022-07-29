@@ -14,7 +14,7 @@ import net.minecraftforge.common.data.LanguageProvider;
 public class LangProvider extends LanguageProvider{
 	private String locale;
 	
-	private enum Locale {
+	public enum Locale {
 		EN_US("en_us");
 		
 		public String str;
@@ -25,6 +25,34 @@ public class LangProvider extends LanguageProvider{
 		super(gen, Reference.MOD_ID, locale);
 		this.locale = locale;
 	}
+	
+	//=========GUI ELEMENTS====================
+	public static final Translation CONFIG_TYPESELECT_ITEMS = Translation.Builder.start("pmmo.objectType.items")
+			.addLocale(Locale.EN_US, "Items").build();
+	public static final Translation CONFIG_TYPESELECT_BLOCKS = Translation.Builder.start("pmmo.objectType.blockss")
+			.addLocale(Locale.EN_US, "Blocks").build();
+	public static final Translation CONFIG_TYPESELECT_ENTITIES = Translation.Builder.start("pmmo.objectType.entities")
+			.addLocale(Locale.EN_US, "Entities").build();
+	public static final Translation CONFIG_TYPESELECT_DIMENSIONS = Translation.Builder.start("pmmo.objectType.dimensions")
+			.addLocale(Locale.EN_US, "Dimensions").build();
+	public static final Translation CONFIG_TYPESELECT_BIOMES = Translation.Builder.start("pmmo.objectType.biomes")
+			.addLocale(Locale.EN_US, "Biomes").build();
+	public static final Translation CONFIG_TYPESELECT_PLAYERS = Translation.Builder.start("pmmo.objectType.players")
+			.addLocale(Locale.EN_US, "Players").build();
+	public static final Translation CONFIG_TYPESELECT_ENCHANTMENTS = Translation.Builder.start("pmmo.objectType.enchantments")
+			.addLocale(Locale.EN_US, "Enchantments").build();
+	public static final Translation CONFIG_TYPESELECT_DEFAULT = Translation.Builder.start("pmmo.objectType.default")
+			.addLocale(Locale.EN_US, "-- Select Object Type --").build();
+	public static final Translation CONFIG_OBJECTSELECT_DEFAULT = Translation.Builder.start("pmmo.objectSelect.default")
+			.addLocale(Locale.EN_US, "-- Select Object --").build();
+	public static final Translation CONFIG_CONFIGURE = Translation.Builder.start("pmmo.gui.configure")
+			.addLocale(Locale.EN_US, "Configure").build();
+	public static final Translation CONFIG_PROMPT_TYPE = Translation.Builder.start("pmmo.gui.select_type")
+			.addLocale(Locale.EN_US, "Select Type").build();
+	public static final Translation CONFIG_FILTER_OBJECTS = Translation.Builder.start("pmmo.gui.filter_object")
+			.addLocale(Locale.EN_US, "Filter Objects").build();
+	public static final Translation CONFIG_PROMPT_OBJECT = Translation.Builder.start("pmmo.gui.select_object")
+			.addLocale(Locale.EN_US, "Select Object").build();
 	
 	//=========LOGIN HANDLER===================
 	public static final Translation WELCOME_TEXT = Translation.Builder.start("pmmo.welcomeText")
@@ -91,23 +119,35 @@ public class LangProvider extends LanguageProvider{
 	"pmmo.enum.DISABLE_PERK":"Disable Perk",
 	 */
 	
+	//=========CODEC SPECS=====================
+	public static final Translation CODECSPEC_ISTAGFOR = Translation.Builder.start("pmmo.codecspec.istagfor")
+			.addLocale(Locale.EN_US, "Replicates configuration settings to all listed items").build();
+	public static final Translation CODECSPEC_LONGMAP = Translation.Builder.start("pmmo.codecspec.longmap")
+			.addLocale(Locale.EN_US, "Contains a map of skillnames and experience values").build();
+	public static final Translation CODECSPEC_INTMAP = Translation.Builder.start("pmmo.codecspec.intmap")
+			.addLocale(Locale.EN_US, "Contains a map of skillnames and level values").build();
+	public static final Translation CODECSPEC_DBLMAP = Translation.Builder.start("pmmo.codecspec.dblmap")
+			.addLocale(Locale.EN_US, "Contains a map of skillnames and modifier values").build();
+	public static final Translation CODECSPEC_XP_VALUES = Translation.Builder.start("pmmo.codecspec.xp_values")
+			.addLocale(Locale.EN_US, "Contains a map of XP award events and the xp values awarded").build();
 	
 	@Override
 	protected void addTranslations() {
 		for (Field entry : this.getClass().getDeclaredFields()) {
 			if (entry.getType() == Translation.class) {
-				//add((Translation)entry.get(LangProvider.class));
+				try {
+					addTranslation((Translation)entry.get(LangProvider.class));
+				} catch (IllegalAccessException e) {e.printStackTrace();}
 			}
 		}
-		add(ENUM_ANVIL_REPAIR);
-		add(ENUM_BLOCK_BREAK);
 	}
 	
-	private void add(Translation translation) {
+	private void addTranslation(Translation translation) {
 		add(translation.key(), translation.localeMap().getOrDefault(locale, ""));
 	}
 	
 	public static record Translation(String key, Map<String, String> localeMap) {
+		public static final Translation EMPTY = new Translation("", new HashMap<>());
 		public MutableComponent asComponent() {
 			return Component.translatable(key());
 		}
