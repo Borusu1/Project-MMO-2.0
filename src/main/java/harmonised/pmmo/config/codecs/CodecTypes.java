@@ -19,7 +19,9 @@ import harmonised.pmmo.api.enums.ReqType;
 import harmonised.pmmo.core.nbt.LogicEntry;
 import harmonised.pmmo.util.CodecSpec.*;
 import harmonised.pmmo.util.Functions;
+import harmonised.pmmo.util.TagUtils;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.level.ChunkPos;
 
@@ -117,8 +119,19 @@ public class CodecTypes {
 				new MapSpec("levelReq", String.class, Integer.class),
 				new MapSpec("xpPerItem", String.class, Long.class),
 				new PrimativeSpec("salvageMax", Integer.class),
-				new PrimativeSpec("baseChanc", Double.class),
+				new PrimativeSpec("baseChance", Double.class),
 				new PrimativeSpec("maxChance", Double.class)));
+		
+		public CompoundTag asTag() {
+			CompoundTag nbt = new CompoundTag();
+			nbt.put("chancePerLevel", TagUtils.dblMapToCompound(chancePerLevel));
+			nbt.put("levelReq", TagUtils.intMapToCompound(levelReq));
+			nbt.put("xpPerItem", TagUtils.longMapToCompound(xpAward));
+			nbt.putInt("salvageMax", salvageMax);
+			nbt.putDouble("baseChance", baseChance);
+			nbt.putDouble("maxChance", maxChance);
+			return nbt;
+		}
 	}
 	public static final Codec<SalvageData> SALVAGE_CODEC = RecordCodecBuilder.create(instance -> instance.group(
 			Codec.unboundedMap(Codec.STRING, Codec.DOUBLE).fieldOf("chancePerLevel").forGetter(SalvageData::chancePerLevel),

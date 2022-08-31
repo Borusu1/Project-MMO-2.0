@@ -271,7 +271,7 @@ public class LangProvider extends LanguageProvider{
 			}
 		}
 		for (Translation implied : impliedTranslations) {
-			add(implied);
+			addTranslation(implied);
 		}
 	}
 	

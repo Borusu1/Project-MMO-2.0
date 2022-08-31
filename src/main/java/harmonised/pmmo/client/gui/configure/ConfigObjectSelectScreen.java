@@ -1,21 +1,14 @@
 package harmonised.pmmo.client.gui.configure;
 
-import java.lang.reflect.Type;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.reflect.TypeToken;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 
-import harmonised.pmmo.api.enums.EventType;
 import harmonised.pmmo.client.gui.SelectionWidget;
 import harmonised.pmmo.client.gui.SelectionWidget.SelectionEntry;
+import harmonised.pmmo.client.utils.DataConsolidator;
 import harmonised.pmmo.core.Core;
 import harmonised.pmmo.setup.datagen.LangProvider;
 import harmonised.pmmo.setup.datagen.LangProvider.Translation;
@@ -26,6 +19,7 @@ import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.fml.LogicalSide;
@@ -88,8 +82,8 @@ public class ConfigObjectSelectScreen extends Screen{
 			this.filteredObjects = filteredObjects;
 		}
 		
-		public ConfigEditScreen getScreen(ResourceLocation objectID, JsonObject defaults) {
-			return new ConfigEditScreen(spec, objectID, defaults);
+		public ConfigEditScreen getScreen(Screen screen, ResourceLocation objectID, CompoundTag defaults) {
+			return new ConfigEditScreen(screen, this.spec, objectID, defaults);
 		}
 		
 		public List<SelectionEntry<ResourceLocation>> getObjectList(String filter) {
@@ -112,7 +106,7 @@ public class ConfigObjectSelectScreen extends Screen{
 		});
 		typeSelect.setEntries(Arrays.stream(TYPES.values()).map(type -> new SelectionEntry<>(type.translation.asComponent(), type)).toList());
 		selectButton = new Button(this.width/2 - 32, 120, 64, 20, LangProvider.CONFIG_CONFIGURE.asComponent()
-				, button -> Minecraft.getInstance().setScreen(typeSelection.getScreen(objectSelection, getDefaultSetting())));
+				, button -> Minecraft.getInstance().setScreen(typeSelection.getScreen(this, objectSelection, getDefaultSetting())));
 		
 		this.addWidget(typeSelect);
 		this.addWidget(objectSelect);
@@ -147,41 +141,10 @@ public class ConfigObjectSelectScreen extends Screen{
 		return super.mouseClicked(mouseX, mouseY, partialTicks);
 	}
 	
-	private static final Type mapType = new TypeToken<HashMap<?, ?>>(){}.getType();
-	private JsonObject getDefaultSetting() {
-		JsonObject root = new JsonObject();
-		Core core = Core.get(LogicalSide.CLIENT);
-		final Gson gson = new Gson(); 
-		switch(typeSelection) {
-		case ITEMS: {
-			root.add("xp_values", Arrays.stream(EventType.ITEM_APPLICABLE_EVENTS)
-					.map(event -> core.getXpUtils().getObjectExperienceMap(event, objectSelection))
-					.map(map -> gson.toJsonTree(map, mapType))
-					.collect(Collectors.toMap(null, null)));
-			return root;
-		}
-		case BLOCKS: {
-			return root;
-		}
-		case ENTITIES: {
-			return root;
-		}
-		case DIMENSIONS: {
-			return root;
-		}
-		case BIOMES: {
-			return root;
-		}
-		case PLAYERS: {
-			return root;
-		}
-		case ENCHANTMENTS: {
-			return root;
-		}
-		default:
-			return root;
-		}
-		
-		
+	private CompoundTag getDefaultSetting() {
+		return DataConsolidator.getExistingData(
+				Core.get(LogicalSide.CLIENT), 
+				objectSelection, 
+				DataConsolidator.ObjectType.fromConfigSelectType(typeSelection));
 	}
 }

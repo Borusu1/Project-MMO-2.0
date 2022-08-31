@@ -7,6 +7,7 @@ import harmonised.pmmo.api.enums.EventType;
 import harmonised.pmmo.api.enums.ModifierDataType;
 import harmonised.pmmo.api.enums.ReqType;
 import harmonised.pmmo.config.codecs.CodecTypes.SalvageData;
+import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 
 public interface CodecSpec {
@@ -25,6 +26,13 @@ public interface CodecSpec {
 		public String getField() {return fieldName();}
 		@Override
 		public List<CodecSpec> getMembers() {return new ArrayList<>();}
+		public byte getTagType() {
+			if (listType.isAssignableFrom(Integer.class)) return Tag.TAG_INT;
+			if (listType.isAssignableFrom(Double.class)) return Tag.TAG_DOUBLE;
+			if (listType.isAssignableFrom(Long.class)) return Tag.TAG_LONG;
+			if (listType.isAssignableFrom(String.class)) return Tag.TAG_STRING;
+			return 0;
+		}
 	}
 	
 	public static record MapSpec(String fieldName, Class<?> keyTypes, Class<?> valueTypes) implements CodecSpec {

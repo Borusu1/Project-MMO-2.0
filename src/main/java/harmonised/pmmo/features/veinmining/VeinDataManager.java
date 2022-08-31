@@ -11,7 +11,9 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import harmonised.pmmo.config.Config;
 import harmonised.pmmo.util.MsLoggy;
 import harmonised.pmmo.util.MsLoggy.LOG_CODE;
+import harmonised.pmmo.util.RegistryUtil;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
@@ -39,6 +41,14 @@ public class VeinDataManager {
 					this.chargeRate().orElse(0d) > other.chargeRate().orElse(0d) ? this.chargeRate() : other.chargeRate(),
 					this.consumeAmount().orElse(0) > other.consumeAmount().orElse(0) ? this.consumeAmount() : other.consumeAmount());
 		}
+		
+		public CompoundTag asTag() {
+			CompoundTag nbt = new CompoundTag();
+			chargeCap.ifPresent(value -> nbt.putInt("chargeCap", value));
+			chargeRate.ifPresent(value -> nbt.putDouble("chargeRage", value));
+			consumeAmount.ifPresent(value -> nbt.putInt("consumeAmount", value));
+			return nbt;
+		}
 	}
 	//===================DATA MANAGEMENT====================================
 	public void setVeinData(ResourceLocation objectID, VeinData veinData) {
@@ -55,36 +65,32 @@ public class VeinDataManager {
 		return markers.getOrDefault(playerID, BlockPos.ZERO);
 	}
 	
-	@SuppressWarnings("deprecation")
 	public boolean hasData(ItemStack stack) {
-		return data.containsKey(stack.getItem().builtInRegistryHolder().unwrapKey().get().location());
+		return data.containsKey(RegistryUtil.getId(stack));
 	}
-	@SuppressWarnings("deprecation")
 	public boolean hasChargeData(ItemStack stack) {
-		ResourceLocation stackID = stack.getItem().builtInRegistryHolder().unwrapKey().get().location();
+		ResourceLocation stackID = RegistryUtil.getId(stack);
 		return hasData(stack) ?
 				!(data.get(stackID).chargeCap().orElseGet(() -> VeinData.EMPTY.chargeCap().get()) == VeinData.EMPTY.chargeCap().get()
 				&& data.get(stackID).chargeRate().orElseGet(() -> VeinData.EMPTY.chargeRate().get()) == VeinData.EMPTY.chargeRate().get())
 				: false;
 	}	
-	@SuppressWarnings("deprecation")
 	public int getBlockConsume(Block block) {
-		return data.getOrDefault(block.builtInRegistryHolder().unwrapKey().get().location(), VeinData.EMPTY).consumeAmount().orElseGet(() -> {
+		return data.getOrDefault(RegistryUtil.getId(block), VeinData.EMPTY).consumeAmount().orElseGet(() -> {
 			return Config.REQUIRE_SETTING.get() ? -1 : Config.DEFAULT_CONSUME.get();
 		});
 	}
 	
-	@SuppressWarnings("deprecation")
 	public int getItemChargeCapSetting(ItemStack stack) {
-		return data.getOrDefault(stack.getItem().builtInRegistryHolder().unwrapKey().get().location(), VeinData.EMPTY).chargeCap().orElse(0);
+		return data.getOrDefault(RegistryUtil.getId(stack), VeinData.EMPTY).chargeCap().orElse(0);
 	}
 	
-	@SuppressWarnings("deprecation")
 	public double getItemRechargeRateSetting(ItemStack stack) {
-		return data.getOrDefault(stack.getItem().builtInRegistryHolder().unwrapKey().get().location(), VeinData.EMPTY).chargeRate().orElse(0d);
+		return data.getOrDefault(RegistryUtil.getId(stack), VeinData.EMPTY).chargeRate().orElse(0d);
 	}
-	@SuppressWarnings("deprecation")
 	public VeinData getData(ItemStack stack) {
-		return data.getOrDefault(stack.getItem().builtInRegistryHolder().unwrapKey().get().location(), VeinData.EMPTY);
+		return data.getOrDefault(RegistryUtil.getId(stack), VeinData.EMPTY);
 	}
+	
+	public VeinData getData(ResourceLocation id) {return data.getOrDefault(id, VeinData.EMPTY);}
 }

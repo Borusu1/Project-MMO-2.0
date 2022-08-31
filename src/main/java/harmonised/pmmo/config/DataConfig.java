@@ -113,6 +113,10 @@ public class DataConfig {
 		return effects;
 	}
 	
+	public Map<ResourceLocation, Integer> getItemEffects(ResourceLocation itemID) {
+		return reqEffectData.getOrDefault(itemID, new HashMap<>());
+	}
+	
 	public List<ResourceLocation> getVeinBlacklist(ResourceLocation locationID) {
 		return veinBlacklistData.get(locationID);
 	}

@@ -2,6 +2,8 @@ package harmonised.pmmo.util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.DoubleTag;
 import net.minecraft.nbt.FloatTag;
@@ -9,6 +11,7 @@ import net.minecraft.nbt.IntTag;
 import net.minecraft.nbt.LongTag;
 import net.minecraft.nbt.NumericTag;
 import net.minecraft.nbt.ShortTag;
+import net.minecraft.resources.ResourceLocation;
 
 public class TagUtils {
 
@@ -45,5 +48,29 @@ public class TagUtils {
 				output.put(key, tag2.get(key));				
 		}
 		return output;
+	}
+	
+	public static CompoundTag intMapToCompound(Map<String, Integer> inMap) {
+		CompoundTag nbt = new CompoundTag();
+		inMap.forEach((key, value) -> nbt.putInt(key, value));
+		return nbt;
+	}
+	
+	public static CompoundTag dblMapToCompound(Map<String, Double> inMap) {
+		CompoundTag nbt = new CompoundTag();
+		inMap.forEach((key, value) -> nbt.putDouble(key, value));
+		return nbt;
+	}
+	
+	public static CompoundTag longMapToCompound(Map<String, Long> inMap) {
+		CompoundTag nbt = new CompoundTag();
+		inMap.forEach((key, value) -> nbt.putLong(key, value));
+		return nbt;
+	}
+	
+	public static CompoundTag effectMapToCompound(Map<ResourceLocation, Integer> inMap) {
+		CompoundTag nbt = new CompoundTag();
+		inMap.forEach((key, value) -> nbt.putInt(key.toString(), value));
+		return nbt;
 	}
 }
