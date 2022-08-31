@@ -4,6 +4,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
+import harmonised.pmmo.config.writers.PackGenerator;
 import harmonised.pmmo.network.Networking;
 import harmonised.pmmo.network.clientpackets.CP_OpenConfigGUI;
 import net.minecraft.commands.CommandSourceStack;
@@ -22,7 +23,12 @@ public class CmdPmmoRoot {
 							Networking.sendToClient(new CP_OpenConfigGUI(), ctx.getSource().getPlayerOrException());
 							return 0;
 						}))						
-				.then(Commands.literal("tools"))
+				.then(Commands.literal("genData")
+						.requires(ctx -> ctx.hasPermission(2))
+						.executes(ctx -> {
+							PackGenerator.generateEmptyPack(ctx.getSource().getServer());
+							return 0;
+						}))
 				.then(Commands.literal("checkbiome"))
 				.then(Commands.literal("debug"))
 				.then(Commands.literal("help")
